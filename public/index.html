@@ -61,6 +61,8 @@
             box-sizing: border-box;
             font-size: 1.5rem;
             color: #ccc;
+            position: relative;
+            z-index: 1;
         }
 
         nav > * {
@@ -82,8 +84,7 @@
 
         canvas {
             position: relative;
-            left: 0 !important;
-            top: 0 !important;
+            pointer-events: auto;
         }
 
 
@@ -100,8 +101,8 @@
                     latest dev
                 </span>
             </nav>
-            <section id="drag__target" dropzone="true">
-                <div id='drag__hint'>
+            <section id='drag__target' dropzone="true">
+                <div  id='drag__hint'>
                     <span id='hint__text' class="">
                         <span id='hint__text__main'>DRAG SWF INTO ME!</span>                    
                         <span id='hint__text__error' class="hide"> THIS IS NOT SWF!!!111</span>
@@ -154,7 +155,6 @@
         dropArea.addEventListener('drop', (e) => {
             e.preventDefault();
             dropHint.classList.toggle('over', false);
-
             const dt = e.dataTransfer;
             /**
              * @type {File} 
@@ -179,15 +179,16 @@
                 window.location.reload();
                 return;
             }
-
-            player = new AWAYFL.DemoPlayer(dropArea);
+            
+            const p = dropHint.parentElement;
+            player = new AWAYFL.DemoPlayer(p);
 
             await player.loadBuffer(await file.arrayBuffer());
 
             const canvas = player.canvas;
             dropHint.remove();
 
-            dropArea.appendChild(canvas);
+            p.appendChild(canvas);
 
             player.play();
 
