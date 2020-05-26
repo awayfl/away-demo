@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWAYFL TEST</title>
+    <style>
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+        }
+
+        .wrap, section {
+            display:flex;
+            height: 100%;
+            width: 100%;
+            flex-direction: column;
+        }
+        #drag__hint {
+            display: flex;
+            margin: auto;
+
+            justify-content: center;
+            align-items: center;
+
+            width: 80%;
+            height: 80%;
+
+            color: #ccc;
+            background-color: #666;
+            border: 4px solid #888;
+            font-size: 2em;
+            border-radius: 8px;
+        }
+        
+        #drag__hint.over {
+            background-color: #222;
+        }
+
+        #hint__text__error {
+            color: #ee1100;
+        }
+
+        .hide {
+            display: none;
+        }
+
+        nav, footer {
+            width: 100%;
+            height: 4rem;
+            background-color: #222;
+            box-shadow: -1px 1px 9px 8px black;
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+
+            box-sizing: border-box;
+            font-size: 1.5rem;
+            color: #ccc;
+        }
+
+        nav > * {
+            margin-right: 1em;
+        }
+
+        .last {
+            margin-left: auto;
+        }
+
+        .logo {
+            background-image: url("gfx/logo.png");
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+            width: 3rem;
+            height: 3rem;
+        }
+
+        canvas {
+            position: relative;
+            left: 0 !important;
+            top: 0 !important;
+        }
+
+
+    </style>
+</head>
+    <body>
+        <div class="wrap">
+            <nav>
+                <a href="https://github.com/awayfl" target="__blank"> <div class="logo"></div></a>
+                <h4>
+                    AWAYFL SWF CHEKER
+                </h4>
+                <span class="last">
+                    latest dev
+                </span>
+            </nav>
+            <section id="drag__target" dropzone="true">
+                <div id='drag__hint'>
+                    <span id='hint__text' class="">
+                        <span id='hint__text__main'>DRAG SWF INTO ME!</span>                    
+                        <span id='hint__text__error' class="hide"> THIS IS NOT SWF!!!111</span>
+                        <span id='hint__text__await' class="hide"> DROP IT!</span>
+                        <span id='hint__text__load' class="hide"> TRY LOAD...</span>
+                    </span>
+                </div>
+            </section>
+            <footer>
+                <span>FILE: =(</span>
+                <span class="hide last" id="fps__text">FPS: <span id="fps__text__counter">00/30</span></span>
+            </footer>
+        </div> 
+    </body>
+
+    <script>
+        const $ = document.querySelector.bind(document);
+        const dropArea = $('#drag__target');
+        const dropHint = $('#drag__hint');
+        
+        const hints = ['main', 'error', 'await', 'load']
+            .reduce((acc, e) => (acc[e] = $('#hint__text__' + e), acc), {});
+        
+        const showHint = (name) => {
+            Object.keys(hints).forEach((e)=>{
+                hints[e].classList.toggle('hide', name !== e);
+            });
+        }
+
+        dropArea.addEventListener('dragenter', (e) => {
+            e.preventDefault();
+            
+            dropHint.classList.toggle('over', true);
+            showHint('await');
+
+        }, false)
+
+        dropArea.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+
+            dropHint.classList.toggle('over', false);
+            showHint('main');
+
+        }, false)
+
+        dropArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+        }, false)
+
+        dropArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropHint.classList.toggle('over', false);
+
+            const dt = e.dataTransfer;
+            /**
+             * @type {File} 
+             **/
+            const file = dt.files[0];
+
+            if(!file || file.type !== 'application/x-shockwave-flash') {
+
+                showHint('error');
+                return;
+            }
+
+            showHint('load');
+            
+            createPlayer(file);
+        }, false);
+
+        let player = undefined;
+        async function createPlayer(file) {
+            if(player) {
+                alert('Sorry, but AWAYFL can`t reload SWF without page reload =(');
+                window.location.reload();
+                return;
+            }
+
+            player = new AWAYFL.DemoPlayer(dropArea);
+
+            await player.loadBuffer(await file.arrayBuffer());
+
+            const canvas = player.canvas;
+            dropHint.remove();
+
+            dropArea.appendChild(canvas);
+
+            player.play();
+
+            $('#fps__text').classList.toggle('hide', false);
+            const c = $('#fps__text__counter');
+
+            let avg = player.frameRate;
+            setInterval((e)=>{
+                avg = avg * 0.9 + 0.1 * player._currentFps;
+                // нежданчик, но надо. ЛОЛ
+                player._currentFps = 0;
+
+                c.textContent = `${avg.toFixed(0).padLeft('0',2)}/${player.frameRate}`;
+            }, 1000)
+        }
+
+    </script>
+    <script src="js/runtime.js"></script>
+</html>
