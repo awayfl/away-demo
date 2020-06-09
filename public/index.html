@@ -20,6 +20,10 @@
             width: 100%;
             flex-direction: column;
         }
+        section {
+            height: calc(100% - 8rem);
+        }
+
         #drag__hint {
             display: flex;
             margin: auto;
@@ -195,13 +199,11 @@
             $('#fps__text').classList.toggle('hide', false);
             const c = $('#fps__text__counter');
 
-            let avg = player.frameRate;
             setInterval((e)=>{
-                avg = avg * 0.9 + 0.1 * player._currentFps;
+                c.textContent = `${player._currentFps.toFixed(0).padLeft('0',2)}/${player.frameRate}`;
+ 
                 // нежданчик, но надо. ЛОЛ
                 player._currentFps = 0;
-
-                c.textContent = `${avg.toFixed(0).padLeft('0',2)}/${player.frameRate}`;
             }, 1000)
         }
 
