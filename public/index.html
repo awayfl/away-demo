@@ -123,8 +123,6 @@
     </body>
 
     <script>
-        const bug = "/assets/test.swf";
-
         const $ = document.querySelector.bind(document);
         const dropArea = $('#drag__target');
         const dropHint = $('#drag__hint');
@@ -179,7 +177,7 @@
         }, false);
 
         let player = undefined;
-        async function createPlayer(file, buff) {
+        async function createPlayer(file) {
             if(player) {
                 alert('Sorry, but AWAYFL can`t reload SWF without page reload =(');
                 window.location.reload();
@@ -189,10 +187,7 @@
             const p = dropHint.parentElement;
             player = new AWAYFL.DemoPlayer(p);
 
-            if(!buff) 
-                await player.loadBuffer(await file.arrayBuffer());
-            else
-                await player.loadBuffer(buff);
+            await player.loadBuffer(await file.arrayBuffer());
 
             const canvas = player.canvas;
             dropHint.remove();
@@ -211,13 +206,6 @@
                 player._currentFps = 0;
             }, 1000)
         }
-
-        
-        window.addEventListener('load', ()=>{
-            fetch(bug).then((e) => e.arrayBuffer()).then((b)=>{
-                createPlayer(undefined, b);
-            })
-        })
 
     </script>
     <script src="js/runtime.js"></script>

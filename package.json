@@ -3,8 +3,7 @@
 	"version": "0.0.1",
 	"description": "Papa-Series in AwayFL",
 	"scripts": {
-		"rollup": "rollup -c",
-		"watch": "rollup -c -w"
+		"rollup": "rollup -c"
 	},
 	"keywords": [
 		"AwayJS",
