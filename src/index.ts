@@ -1,6 +1,7 @@
 
-console.debug("AWAY RUNTIME - 0.0.21");
+console.debug("AWAY RUNTIME - 0.0.21 - test");
 
+import "./decompose";
 import { AVMPlayer } from "@awayfl/awayfl-player"
 
 

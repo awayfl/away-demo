@@ -24,13 +24,6 @@ export default {
 				'random-seed': [ 'create' ],
 				'../@awayfl/avm1/node_modules/random-seed/index.js':['create']
 			},
-		}),
-		terser({
-			// mangle: {
-			// 	properties: {
-			// 		reserved: ['startPokiGame', 'userAgent', 'Number', '__constructor__', 'prototype']
-			// 	}
-			// }
 		})
 	]
 };
