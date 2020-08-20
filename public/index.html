@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AWAYFL TEST</title>
     <style>
+        * {
+            user-select: none;
+        }
         html, body {
             height: 100%;
             width: 100%;
@@ -53,9 +56,7 @@
             display: none;
         }
 
-        nav, footer {
-            width: 100%;
-            height: 4rem;
+        .dark {
             background-color: #222;
             box-shadow: -1px 1px 9px 8px black;
             display: flex;
@@ -65,6 +66,11 @@
             box-sizing: border-box;
             font-size: 1.5rem;
             color: #ccc;
+        }
+
+        nav, footer {
+            width: 100%;
+            height: 4rem;
             position: relative;
             z-index: 1;
         }
@@ -73,8 +79,45 @@
             margin-right: 1em;
         }
 
+        #version__box {
+            flex-direction: column;
+            width: 420px;
+            font-size: 16px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    
+        #version__list {
+            display: flex;
+            flex-direction: column;
+        }
+
+        #version__close {
+            margin: 0.5em;
+            font-size: 1.5em;
+        }
+
+        #header {
+            overflow-wrap: normal;
+            height: 100%;
+            overflow: hidden;
+        }
+
         .last {
             margin-left: auto;
+        }
+
+        .button {
+            background: #444;
+            border-radius: 4px;
+            padding: 4px 10px;
+        }
+
+        .button:hover {
+            background: #666;
+            cursor: pointer;
         }
 
         .logo {
@@ -96,34 +139,73 @@
 </head>
     <body>
         <div class="wrap">
-            <nav>
+            <nav class="dark">
                 <a href="https://github.com/awayfl" target="__blank"> <div class="logo"></div></a>
-                <h4>
+                <h4 id="header">
                     AWAYFL SWF CHEKER
                 </h4>
-                <span class="last">
-                    latest dev
+                <span class="last button" id ="version__open">
+                    v.0.0
                 </span>
             </nav>
             <section id='drag__target' dropzone="true">
                 <div  id='drag__hint'>
                     <span id='hint__text' class="">
-                        <span id='hint__text__main'>DRAG SWF INTO ME!</span>                    
+                        <span id='hint__text__main'>DRAG SWF INTO ME!</br> ...or click!</span>                    
                         <span id='hint__text__error' class="hide"> THIS IS NOT SWF!!!111</span>
                         <span id='hint__text__await' class="hide"> DROP IT!</span>
                         <span id='hint__text__load' class="hide"> TRY LOAD...</span>
                     </span>
                 </div>
             </section>
-            <footer>
+            <div id="version__box" class="dark" style="display: none;">
+                <h4>AWAY LIB VERSION</h4>
+                <div id='version__list'></div>
+                <div class="button" id='version__close'>Close</div>
+            </div>
+            <footer class="dark">
                 <span>FILE: =(</span>
                 <span class="hide last" id="fps__text">FPS: <span id="fps__text__counter">00/30</span></span>
             </footer>
-        </div> 
+        </div>
+        <input type="file" id="file-input" style="display: none;" accept=".swf"/>
     </body>
 
     <script>
         const $ = document.querySelector.bind(document);
+
+        function fillVersion(libs, runtime) {
+            $("#version__open").textContent = "v"+runtime.split(" - ")[1];
+            
+            const list = $('#version__list');
+
+            libs.forEach((e) =>  {
+                const n = document.createElement("span");
+                n.textContent = e;
+                list.appendChild(n);
+            })
+        }
+
+        (function() {
+            const orig = console.debug;
+            const versions = [];
+            console.debug = (s) => {
+                if(s && s.match(/AwayJS|AwayFL/)) {
+                    versions.push(s);
+                }
+
+                orig.call(console, s);
+
+                if(s && s.match(/AWAY RUNTIME/)) {
+                    console.debug = orig;
+                    fillVersion(versions, s);   
+                }
+            }
+        })();
+
+        const openV = $('#version__open');
+        const closeV = $('#version__close');
+        
         const dropArea = $('#drag__target');
         const dropHint = $('#drag__hint');
         
@@ -136,6 +218,14 @@
             });
         }
 
+        openV.addEventListener('click', e=>{
+            $('#version__box').style.display = '';
+        })
+
+        closeV.addEventListener('click', e=>{
+            $('#version__box').style.display = 'none';
+        })
+        
         dropArea.addEventListener('dragenter', (e) => {
             e.preventDefault();
             
@@ -155,8 +245,8 @@
         dropArea.addEventListener('dragover', (e) => {
             e.preventDefault();
         }, false)
-
-        dropArea.addEventListener('drop', (e) => {
+        
+        const handleFile = (e) => {
             e.preventDefault();
             dropHint.classList.toggle('over', false);
             const dt = e.dataTransfer;
@@ -174,7 +264,8 @@
             showHint('load');
             
             createPlayer(file);
-        }, false);
+        };
+
 
         let player = undefined;
         async function createPlayer(file) {
@@ -206,6 +297,25 @@
                 player._currentFps = 0;
             }, 1000)
         }
+
+        dropArea.addEventListener('drop', handleFile, false);
+
+        const _click = e => {
+            const fi = $('#file-input');
+
+            fi.addEventListener('change', (e) =>{
+                if(fi.files.length > 0) {
+                    e.preventDefault();
+                    dropArea.removeEventListener("click", _click);
+                    handleFile({
+                        preventDefault: ()=>{},
+                        dataTransfer: {files:fi.files}
+                    })
+                }
+            })
+            fi.click();
+        };
+        dropArea.addEventListener('click', _click);
 
     </script>
     <script src="js/runtime.js?v=4"></script>

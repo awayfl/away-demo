@@ -1,7 +1,7 @@
 {
-	"name": "papa_series",
-	"version": "0.0.1",
-	"description": "Papa-Series in AwayFL",
+	"name": "away-demo",
+	"version": "0.1.1",
+	"description": "Fast checker for AwayFL",
 	"scripts": {
 		"rollup": "rollup -c"
 	},
@@ -12,7 +12,7 @@
 		"graphics",
 		"WebGL"
 	],
-	"author": "Rob Bateman",
+	"author": "Konstantin Timoshenko",
 	"license": "Apache-2.0",
 	"dependencies": {
 		"@awayfl/avm1": "^0.2.0",

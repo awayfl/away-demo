@@ -1,5 +1,5 @@
 
-console.debug("AWAY RUNTIME - 0.0.21");
+console.debug("AWAY RUNTIME - 0.0.24");
 
 import { AVMPlayer } from "@awayfl/awayfl-player"
 
@@ -10,6 +10,7 @@ export class DemoPlayer extends AVMPlayer {
     constructor(container) {
         super({
             x:'0%', y: '0%', w: '100', h: '100%',
+            stageScaleMode: 'showAll',
             files: [
                 { path: "assets/fonts.swf", resourceType: "FONTS" },                
             ]
