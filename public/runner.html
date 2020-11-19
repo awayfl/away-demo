@@ -1,0 +1,32 @@
+<head>
+    <style>
+        html, body {
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        window.VERSION = [];
+        window.RUNTIME_VERSION = '';
+
+        const orig = console.debug;
+        
+        console.debug = (s) => {
+            if(s && s.match(/AwayJS|AwayFL/)) {
+                window.VERSION.push(s);
+            }
+
+            orig.call(console, s);
+
+            if(s && s.match(/AWAY RUNTIME/)) {
+                console.debug = orig;
+                window.RUNTIME_VERSION = s;   
+            }
+        }
+    </script>
+    <script src="js/runtime.js?v=5"></script>
+</body>

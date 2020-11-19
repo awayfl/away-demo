@@ -1,9 +1,11 @@
 
-console.debug("AWAY RUNTIME - 0.0.24");
+console.debug("AWAY RUNTIME - 0.0.25");
 
+import { LoaderInfo } from "@awayfl/playerglobal"
 import { AVMPlayer } from "@awayfl/awayfl-player"
 
 
+LoaderInfo.DefaultLocation = "http://localhost";
 //@ts-ignore
 export class DemoPlayer extends AVMPlayer {
     container: HTMLDivElement;

@@ -24,6 +24,7 @@
             flex-direction: column;
         }
         section {
+            position: relative;
             height: calc(100% - 8rem);
         }
 
@@ -129,11 +130,16 @@
             height: 3rem;
         }
 
-        canvas {
-            position: relative;
+        iframe {
+            border: none;
+            width: 100%;
+            height: 100%;
+            position: absolute;
             pointer-events: auto;
+            transition: all 0.5s;
+            opacity: 0;
+            pointer-events: none;
         }
-
 
     </style>
 </head>
@@ -144,17 +150,20 @@
                 <h4 id="header">
                     AWAYFL SWF CHEKER
                 </h4>
-                <span class="last button" id ="version__open">
+                <span class="last button" id = "open">
+                    Open
+                </span>
+                <span class="button" id ="version__open">
                     v.0.0
                 </span>
             </nav>
             <section id='drag__target' dropzone="true">
+                <iframe src='./runner.html'></iframe>
                 <div  id='drag__hint'>
                     <span id='hint__text' class="">
-                        <span id='hint__text__main'>DRAG SWF INTO ME!</br> ...or click!</span>                    
+                        <span id='hint__text__main'>CLICK ME!</span>                    
                         <span id='hint__text__error' class="hide"> THIS IS NOT SWF!!!111</span>
-                        <span id='hint__text__await' class="hide"> DROP IT!</span>
-                        <span id='hint__text__load' class="hide"> TRY LOAD...</span>
+                        <span id='hint__text__load' class="hide"> Trying to load...</span>
                     </span>
                 </div>
             </section>
@@ -164,21 +173,51 @@
                 <div class="button" id='version__close'>Close</div>
             </div>
             <footer class="dark">
-                <span>FILE: =(</span>
+                <span id = 'file_info'>FILE: =(</span>
                 <span class="hide last" id="fps__text">FPS: <span id="fps__text__counter">00/30</span></span>
             </footer>
         </div>
-        <input type="file" id="file-input" style="display: none;" accept=".swf"/>
+        <input type="file" id="file-input" style="display: none;"/>
     </body>
 
     <script>
+        const FLASH_MAP = {
+                [9]:  9.0 ,   
+                [10]: 10.0,
+                [11]: 10.2,
+                [12]: 10.3,
+                [13]: 11.0,
+                [14]: 11.1,
+                [15]: 11.2,
+                [16]: 11.3,
+                [17]: 11.4,
+                [18]: 11.5,
+                [19]: 11.6
+        };
+
         const $ = document.querySelector.bind(document);
+        const frame = $('iframe');
+
+        let runtime;
+
+        function reloadRuntime() {
+            runtime && runtime.location.reload();
+
+            return new Promise((res) => {
+                    frame.onload = () =>{
+                        runtime = frame.contentWindow;
+                        res();
+                    };
+                }
+            );
+        }
 
         function fillVersion(libs, runtime) {
             $("#version__open").textContent = "v"+runtime.split(" - ")[1];
             
             const list = $('#version__list');
 
+            list.innerHTML = '';
             libs.forEach((e) =>  {
                 const n = document.createElement("span");
                 n.textContent = e;
@@ -186,23 +225,13 @@
             })
         }
 
-        (function() {
-            const orig = console.debug;
-            const versions = [];
-            console.debug = (s) => {
-                if(s && s.match(/AwayJS|AwayFL/)) {
-                    versions.push(s);
-                }
+        reloadRuntime().then(()=>{
+            setTimeout(()=>{
+                fillVersion(runtime.VERSION, runtime.RUNTIME_VERSION);
+            }, 1000)
+        });
 
-                orig.call(console, s);
-
-                if(s && s.match(/AWAY RUNTIME/)) {
-                    console.debug = orig;
-                    fillVersion(versions, s);   
-                }
-            }
-        })();
-
+        const openBtn = $('#open');
         const openV = $('#version__open');
         const closeV = $('#version__close');
         
@@ -214,7 +243,7 @@
         
         const showHint = (name) => {
             Object.keys(hints).forEach((e)=>{
-                hints[e].classList.toggle('hide', name !== e);
+                hints[e] && hints[e].classList.toggle('hide', name !== e);
             });
         }
 
@@ -225,27 +254,7 @@
         closeV.addEventListener('click', e=>{
             $('#version__box').style.display = 'none';
         })
-        
-        dropArea.addEventListener('dragenter', (e) => {
-            e.preventDefault();
-            
-            dropHint.classList.toggle('over', true);
-            showHint('await');
 
-        }, false)
-
-        dropArea.addEventListener('dragleave', (e) => {
-            e.preventDefault();
-
-            dropHint.classList.toggle('over', false);
-            showHint('main');
-
-        }, false)
-
-        dropArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-        }, false)
-        
         const handleFile = (e) => {
             e.preventDefault();
             dropHint.classList.toggle('over', false);
@@ -268,37 +277,51 @@
 
 
         let player = undefined;
+        
+        const c = $('#fps__text__counter'); 
+        setInterval((e)=>{
+            $('#fps__text').classList.toggle('hide', !player);
+
+            if(!player) return;
+
+            c.textContent = `${ player._currentFps.toFixed(0).padStart('0',2)}/${player.frameRate}`;
+            player._currentFps = 0;
+        }, 1000)
+    
         async function createPlayer(file) {
+
             if(player) {
-                alert('Sorry, but AWAYFL can`t reload SWF without page reload =(');
-                window.location.reload();
-                return;
+                await reloadRuntime();
             }
-            
+
+            frame.style.opacity = 0;
+
             const p = dropHint.parentElement;
-            player = new AWAYFL.DemoPlayer(p);
+            player = new runtime.AWAYFL.DemoPlayer(p);
 
-            await player.loadBuffer(await file.arrayBuffer());
+            const reader = new FileReader();
 
-            const canvas = player.canvas;
-            dropHint.remove();
+            const buff = new Promise(res =>{
+                reader.onload = (e) => res(e.target.result);
+                reader.readAsArrayBuffer(file);
+            });
 
-            p.appendChild(canvas);
+            await player.loadBuffer(await buff);
+        
+            frame.style.opacity = 1;
+            frame.style.pointerEvents = 'all';
+            //dropHint.style.display = 'none';
 
             player.play();
 
-            $('#fps__text').classList.toggle('hide', false);
-            const c = $('#fps__text__counter');
+            const fileInfo = $('#file_info');
+            const data = player._swfFile;
 
-            setInterval((e)=>{
-                c.textContent = `${player._currentFps.toFixed(0).padLeft('0',2)}/${player.frameRate}`;
- 
-                // нежданчик, но надо. ЛОЛ
-                player._currentFps = 0;
-            }, 1000)
+            fileInfo.textContent = `size: ${ data.bytesTotal / 1000 | 0}Kb, flash: ${data.fpVersion}, ${data.useAVM1 ? 'AS2': 'AS3'}`;
+
+            const color = '#' + (data.backgroundColor & 0xffffff).toString(16);
+            frame.style.backgroundColor = color;
         }
-
-        dropArea.addEventListener('drop', handleFile, false);
 
         const _click = e => {
             const fi = $('#file-input');
@@ -315,8 +338,9 @@
             })
             fi.click();
         };
+
+        openBtn.addEventListener('click', _click);
         dropArea.addEventListener('click', _click);
 
     </script>
-    <script src="js/runtime.js?v=4"></script>
 </html>
