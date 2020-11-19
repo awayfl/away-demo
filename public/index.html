@@ -319,7 +319,7 @@
 
             fileInfo.textContent = `size: ${ data.bytesTotal / 1000 | 0}Kb, flash: ${data.fpVersion}, ${data.useAVM1 ? 'AS2': 'AS3'}`;
 
-            const color = '#' + (data.backgroundColor & 0xffffff).toString(16);
+            const color = '#' + (data.backgroundColor & 0xffffff).toString(16).padStart(6, '0');
             frame.style.backgroundColor = color;
         }
 
