@@ -1,5 +1,5 @@
 
-console.debug("AWAY RUNTIME - 0.0.25");
+console.debug("AWAY RUNTIME - 0.0.27");
 
 import { LoaderInfo } from "@awayfl/playerglobal"
 import { AVMPlayer } from "@awayfl/awayfl-player"
@@ -18,18 +18,6 @@ export class DemoPlayer extends AVMPlayer {
             ]
         });
         this.container = container;
-    }
-
-    private resizeCallback(event: any) {
-        const sh = this.stageHeight;
-        const sw = this.stageWidth;
-
-        this.setStageDimensions(0,0, this.container.clientWidth, this.container.clientHeight);
-        this.canvas.style.position = 'relative';
-    }
-
-    get canvas(): HTMLCanvasElement {
-        return this.scene.renderer.context.container
     }
 
     loadBuffer(buffer: ArrayBuffer): Promise<void> {
@@ -55,9 +43,5 @@ export class DemoPlayer extends AVMPlayer {
         this._timer.stop();
         //@ts-ignore
         this._timer.setCallback(undefined, undefined);
-        
-        setTimeout(()=>{
-            super.dispose();
-        });
     }
 }
