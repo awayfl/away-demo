@@ -1,5 +1,4 @@
-
-console.debug("AWAY RUNTIME - 0.0.28");
+console.debug("AWAY RUNTIME - 0.0.29");
 
 import { LoaderInfo } from "@awayfl/playerglobal"
 import { AVMPlayer } from "@awayfl/awayfl-player"
