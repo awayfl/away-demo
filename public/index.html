@@ -212,8 +212,8 @@
             );
         }
 
-        function fillVersion(libs, runtime) {
-            $("#version__open").textContent = "v"+runtime.split(" - ")[1];
+        function fillVersion(runtime, libs) {
+            $("#version__open").textContent = runtime;
             
             const list = $('#version__list');
 
@@ -297,7 +297,7 @@
             frame.style.opacity = 0;
 
             const p = dropHint.parentElement;
-            player = new runtime.AWAYFL.DemoPlayer(p);
+            player = new runtime.AWAYFL.Player(p);
 
             const reader = new FileReader();
 

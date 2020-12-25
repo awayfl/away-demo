@@ -6,27 +6,14 @@
             overflow: hidden;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/gh/eXponenta/away-player-embed@master/dist/runtime.js"></script>
 </head>
 
 <body>
     <script>
-        window.VERSION = [];
-        window.RUNTIME_VERSION = '';
-
-        const orig = console.debug;
-        
-        console.debug = (s) => {
-            if(s && s.match(/AwayJS|AwayFL/)) {
-                window.VERSION.push(s);
-            }
-
-            orig.call(console, s);
-
-            if(s && s.match(/AWAY RUNTIME/)) {
-                console.debug = orig;
-                window.RUNTIME_VERSION = s;   
-            }
-        }
+        window.VERSION = AWAYFL.VERSION || '-';
+        window.RUNTIME_VERSION = Object.keys(AWAYFL.RUNTIME || {}).map((e) => {
+            return `${e}:${AWAYFL.RUNTIME[e]}`
+        });
     </script>
-    <script src="js/runtime.js?v=29"></script>
 </body>
