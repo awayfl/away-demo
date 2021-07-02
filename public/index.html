@@ -264,13 +264,31 @@
              **/
             const file = dt.files[0];
 
-            if(!file || file.type !== 'application/x-shockwave-flash') {
+            if(!file || file.type !== 'application/x-shockwave-flash' && file.type !== '') {
 
                 showHint('error');
                 return;
             }
 
+            
             showHint('load');
+
+            if (file.type === '') {
+                const r = new FileReader();
+                r.readAsArrayBuffer(file);
+                r.onload = (data) => {
+                    const r = data.target.result;
+                    const magic = String.fromCharCode.apply(null, new Uint8Array(r, 0, 3));
+
+                    if (magic === 'CWS' || magic === 'FWS' || magic === 'ZWS') {
+                        createPlayer(file);
+                        return;
+                    }
+
+                    showHint('error');
+                };
+                return;
+            }
             
             createPlayer(file);
         };
@@ -328,12 +346,15 @@
 
             fi.addEventListener('change', (e) =>{
                 if(fi.files.length > 0) {
-                    e.preventDefault();
                     dropArea.removeEventListener("click", _click);
                     handleFile({
                         preventDefault: ()=>{},
                         dataTransfer: {files:fi.files}
-                    })
+                    });
+
+                    e.target.value = '';
+                    e.target.replaceWith(e.target.cloneNode(true));
+                    e.preventDefault();
                 }
             })
             fi.click();
