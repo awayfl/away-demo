@@ -2,9 +2,6 @@
 	"name": "away-demo",
 	"version": "0.1.4",
 	"description": "Fast checker for AwayFL",
-	"scripts": {
-		"rollup": "rollup -c"
-	},
 	"keywords": [
 		"AwayJS",
 		"3D",
@@ -13,41 +10,5 @@
 		"WebGL"
 	],
 	"author": "Konstantin Timoshenko",
-	"license": "Apache-2.0",
-	"dependencies": {
-		"@awayfl/avm1": "^0.2.0",
-		"@awayfl/avm2": "^0.2.0",
-		"@awayfl/awayfl-player": "^0.2.0",
-		"@awayfl/playerglobal": "^0.2.0",
-		"@awayfl/swf-loader": "^0.4.0",
-		"@awayjs/core": "^0.9.0",
-		"@awayjs/graphics": "^0.5.0",
-		"@awayjs/materials": "^0.6.0",
-		"@awayjs/renderer": "^0.11.0",
-		"@awayjs/scene": "^0.13.0",
-		"@awayjs/stage": "^0.11.0",
-		"@awayjs/view": "^0.6.0",
-		"random-seed": "^0.3.0",
-		"tslib": "^1.9.0"
-	},
-	"devDependencies": {
-		"babel-core": "^6.26.3",
-		"copy-webpack-plugin": "^5.1.1",
-		"fs": "^0.0.1-security",
-		"html-webpack-plugin": "^4.2.0",
-		"path": "^0.12.7",
-		"rimraf": "^3.0.2",
-		"rollup": "^1.10.1",
-		"rollup-plugin-commonjs": "^9.3.4",
-		"rollup-plugin-node-resolve": "^4.2.3",
-		"rollup-plugin-terser": "^5.0.0",
-		"rollup-plugin-typescript2": "^0.21.0",
-		"terser-webpack-plugin": "^2.3.5",
-		"ts-loader": "^6.2.2",
-		"typescript": "^3.8.3",
-		"webpack": "^4.42.1",
-		"webpack-cli": "^3.3.11",
-		"webpack-dev-server": "^3.10.3",
-		"webpack-merge": "^4.2.2"
-	}
+	"license": "Apache-2.0"
 }
